@@ -7,13 +7,13 @@ class BLE_Conversions:
 
 def process_msg_data(payload):
     data = {}
-    print(payload)
-    for line in payload.split('\n')[:-2]:
-        m = line.split(':')
-        if m[0] == 'DeviceID':
-            id = 1
-            key = ':'.join(m[:-1])
-            data[key] = m[-1]
+    data = payload.split('\n') 
+    id = data[0].split(':')[-1]
+    bt_data = data[1].split(':')
+    key = ':'.join(bt_data[:-1])
+    data= (key, bt_data[-1])
+    print(data ,id)
+    
     out = {
         'metadata': Metadata(deviceID=id),
         'data':data} 
