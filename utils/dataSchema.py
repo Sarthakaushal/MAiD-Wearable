@@ -1,7 +1,9 @@
 from pydantic import BaseModel
 from typing import Dict
+
+
 class Metadata(BaseModel):
-    deviceID:str
+    deviceID:int
     
 class Message(BaseModel):
     metadata: Metadata

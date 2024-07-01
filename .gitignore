@@ -163,3 +163,5 @@ cython_debug/
 
 mw*
 .gitignore
+nohup.out
+*.csv
