@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 from utils import process_msg_data
 
 # Define the MQTT broker details
-BROKER = '127.0.0.1'
+BROKER = '0.0.0.0'
 PORT = 1883
 KEEPALIVE = 60
 
@@ -13,7 +13,10 @@ REGISTRATION = 'register'
 ACK = 'ack'
 
 # Connected Devices mapping
-connectedDevices = {}
+connectedDevices = []
+# live dict of devices around different devices 
+# Access order live_rssi_vals[<deviceID>][<bt_name>][]
+live_rssi_vals = {}
 
 # Define the callback function for when a message is received
 def on_message(client, userdata, message):
@@ -30,11 +33,23 @@ def on_message(client, userdata, message):
             client.publish(f'{ACK}/{payload}', '200')
 
 def handle_seeker_message(payload):
+    global live_rssi_vals
+    # Update the live dict with the RSSI ßvals
     print(f"Received seeker message")
     obj = process_msg_data(payload)
-    print(obj)
-    # Process the seeker message here
-    # For example, update the state of the seeker
+    dev_id = obj.metadata.deviceID
+    
+    live_rssi_vals[dev_id] =live_rssi_vals.get(dev_id, {})
+    # print(live_rssi_vals[dev_id][obj.data[0]] )
+    live_rssi_vals[dev_id][obj.data[0]] = obj.data[1]
+    # bt_dict[obj.data[]]
+    # live_rssi_vals[dev_id]
+    # = live_rssi_vals[dev_id][obj.data[0]].get()
+    # objs_of_device[obj.data[0]] = objs_of_device.get(obj.data[0], 100)
+    # print(f"Objs of device '{dev_id}' => {objs_of_device}")    
+    # live_rssi_vals[dev_id] = obj
+    
+    print(live_rssi_vals)
 
 def handle_goal_state_message(payload):
     print(f"Received goal state message: {payload}")
@@ -44,7 +59,7 @@ def handle_goal_state_message(payload):
 def device_registration(payload):
     global connectedDevices
     print(f'Received registration request from {payload}')
-    connectedDevices = {payload:True}
+    connectedDevices.append(payload)
     return True
 
 

@@ -69,14 +69,15 @@ async def main():
         # first = True
         while True:
             if not mem_buff.empty():
-                    device_address, rssi, name = mem_buff.get()
-            # rssi_values = await scan_bluetooth_devices()
-            # if first:
-            print(device_address, rssi, name)
-            payload = f"DeviceID:{BT_Loc.DEVICE_ID}\n"
-            payload += f"{device_address}:{rssi}\n"
-            client.publish(BT_Loc.RSSI_TOPIC, payload)
-            # await asyncio.sleep(.1)
+                device_address, rssi, name = get = mem_buff.get()
+                print(get)
+                # rssi_values = await scan_bluetooth_devices()
+                # if first:
+                print(device_address, rssi, name)
+                payload = f"DeviceID:{BT_Loc.DEVICE_ID}\n"
+                payload += f"{device_address}:{rssi}\n"
+                client.publish(BT_Loc.RSSI_TOPIC, payload)
+                # await asyncio.sleep(.1)
     except KeyboardInterrupt:
         print("Terminating...")
     finally:

@@ -1,12 +1,12 @@
 from pydantic import BaseModel
-from typing import Dict
+from typing import Tuple
 
 
 class Metadata(BaseModel):
-    deviceID:int
+    deviceID:str
     
 class Message(BaseModel):
     metadata: Metadata
-    data: Dict
+    data: Tuple
     
     
