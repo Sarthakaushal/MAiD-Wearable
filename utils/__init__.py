@@ -59,6 +59,6 @@ class MsgProcessing:
         output = []
         current_time = time.time()
         for bt_add in bt_devices.keys():
-            if current_time - bt_devices[bt_add]['last_updated']>= cfg.data_expiry_time:
+            if current_time - bt_devices[bt_add]['last_updated']>= cfg.DATA_EXPIRY_TIME:
                 output.append(bt_add)
         return output
