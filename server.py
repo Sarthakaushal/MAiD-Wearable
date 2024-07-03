@@ -1,6 +1,8 @@
 import paho.mqtt.client as mqtt
-from utils import process_msg_data
-
+from utils import MsgProcessing, BLE_Conversions
+from config import CONFIG as cfg
+import copy
+import time
 # Define the MQTT broker details
 BROKER = '0.0.0.0'
 PORT = 1883
@@ -12,10 +14,12 @@ TOPIC_GOAL_STATE = 'devices/goal_device'
 REGISTRATION = 'register'
 ACK = 'ack'
 
+# Tuning params
+update_delta = cfg.DATA_EXPIRY_TIME
+
 # Connected Devices mapping
 connectedDevices = []
 # live dict of devices around different devices 
-# Access order live_rssi_vals[<deviceID>][<bt_name>][]
 live_rssi_vals = {}
 
 # Define the callback function for when a message is received
@@ -35,21 +39,14 @@ def on_message(client, userdata, message):
 def handle_seeker_message(payload):
     global live_rssi_vals
     # Update the live dict with the RSSI ßvals
-    print(f"Received seeker message")
-    obj = process_msg_data(payload)
+    # print(f"Received seeker message")
+    obj = MsgProcessing.process_msg_data(payload)
     dev_id = obj.metadata.deviceID
     
-    live_rssi_vals[dev_id] =live_rssi_vals.get(dev_id, {})
-    # print(live_rssi_vals[dev_id][obj.data[0]] )
-    live_rssi_vals[dev_id][obj.data[0]] = obj.data[1]
-    # bt_dict[obj.data[]]
-    # live_rssi_vals[dev_id]
-    # = live_rssi_vals[dev_id][obj.data[0]].get()
-    # objs_of_device[obj.data[0]] = objs_of_device.get(obj.data[0], 100)
-    # print(f"Objs of device '{dev_id}' => {objs_of_device}")    
-    # live_rssi_vals[dev_id] = obj
-    
-    print(live_rssi_vals)
+    live_rssi_vals[dev_id] =live_rssi_vals.get(dev_id,{})
+    # print(live_rssi_vals[dev_id][obj.data[0]] 
+    live_rssi_vals[dev_id][obj.data[0]] = {'rssi':obj.data[1],
+                                           'last_updated':time.time()}
 
 def handle_goal_state_message(payload):
     print(f"Received goal state message: {payload}")
@@ -58,10 +55,9 @@ def handle_goal_state_message(payload):
 
 def device_registration(payload):
     global connectedDevices
-    print(f'Received registration request from {payload}')
+    # print(f'Received registration request from {payload}')
     connectedDevices.append(payload)
     return True
-
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
@@ -82,4 +78,39 @@ client.subscribe(TOPIC_GOAL_STATE)
 client.subscribe(REGISTRATION)
 
 # Start the MQTT client loop
-client.loop_forever()
+client.loop_start()
+start_time = time.time()
+while True:
+    if live_rssi_vals!={} and cfg.VERBOSE>=3:
+        print(live_rssi_vals)
+        
+    # Get the most relevant data from the live rssi dict
+    now_time = time.time()
+    if now_time - start_time >= update_delta:
+        start_time = now_time
+        # remove unwanted keys from the livedict and data
+        for dev_id in live_rssi_vals:
+            old_keys = MsgProcessing.get_old_keys(live_rssi_vals[dev_id])
+            if len(old_keys)!=0:
+                # remove keys
+                print(f'---- Removing device from live_rssi_dict----  \n\tNames: {old_keys}\n\t')
+                for k in old_keys:
+                    live_rssi_vals[dev_id].pop(k, None)
+            
+                # Calc the distances for the devices
+            for bt_id in live_rssi_vals[dev_id]:
+                dist =  BLE_Conversions.rssi_to_dist(
+                        int(live_rssi_vals[dev_id][bt_id]['rssi']), bt_id)
+                live_rssi_vals[dev_id][bt_id]['dist'] = dist
+        data = copy.copy(live_rssi_vals)
+        
+        print("Data", data)
+        
+    
+
+
+    time.sleep(0.05)
+        
+        
+        
+        
