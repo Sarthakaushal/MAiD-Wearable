@@ -4,8 +4,8 @@ from config import CONFIG as cfg
 import copy
 import time
 # Define the MQTT broker details
-BROKER = '0.0.0.0'
-PORT = 1883
+BROKER = '129.21.41.99'
+PORT = 1833
 KEEPALIVE = 60
 
 # Define the topics
