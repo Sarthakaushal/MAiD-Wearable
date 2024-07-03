@@ -5,8 +5,11 @@ class CONFIG:
     
     # RSSI_0 values
     DEVICE_RSSI = {
-        "C2:15:B9:9A:1B:36":-59,
-        "31:E5:9E:3B:BF:67": -61} # Readings for RSSI at 1 meter
+        "DD:34:02:0A:4B:98": -59, # Billy
+        "DD:34:02:0A:4C:3F": -61, # Jimmy
+        "DD:34:02:0A:4D:2B": -68, # # Maurice
+        "DD:34:02:0A:4D:0B": -69 # Timmy
+        } # Readings for RSSI at 1 meter
     
     # Time for the old values to persist in the system
     DATA_EXPIRY_TIME = 1
@@ -14,8 +17,11 @@ class CONFIG:
     VERBOSE = 2
     
     DEVICE_COORDINATES = {
-        'C2:15:B9:9A:1B:36': (0,0)
-    }
+        "DD:34:02:0A:4B:98": (0,0), # Billy
+        "DD:34:02:0A:4C:3F": (0,23), # Jimmy
+        "DD:34:02:0A:4D:2B": (23,0), # # Maurice
+        "DD:34:02:0A:4D:0B": (23,23) # Timmy
+        }
     
     
     
