@@ -5,16 +5,13 @@ import time
 from edge.conf import BT_Loc
 from queue import Queue
 from core import BleScanner
+
 async def scan_devices():
     scanner = BleakScanner()
-
     devices = await scanner.discover()
     for device in devices:
         if device.name:
             print(f"Device: {device.name}, Address: {device.address}, RSSI: {device.rssi}")
-
-
-
 
 async def scan_bluetooth_devices():
     devices = await BleakScanner.discover()
