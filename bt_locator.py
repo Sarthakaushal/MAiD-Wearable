@@ -76,10 +76,14 @@ async def main():
                 print(device_address, rssi, name)
                 ble_data.insert(device_address, rssi)
                 payload_data = ble_data.get()
-                payload = f"DeviceID:{BT_Loc.DEVICE_ID}\n"
-                for uuid in payload_data.data.keys():
-                    payload += f"{uuid}:{payload_data.data[uuid]}\n"
-                client.publish(BT_Loc.RSSI_TOPIC, payload)
+                print(payload_data)
+                if payload_data.valid:
+                    payload = f"DeviceID:{BT_Loc.DEVICE_ID}\n"
+                    for uuid in payload_data.data.keys():
+                        payload += f"{uuid}:{payload_data.data[uuid][0]}\n"
+                    client.publish(BT_Loc.RSSI_TOPIC, payload)
+                else:
+                    print('Not enough data to publish')
                 # await asyncio.sleep(.1)
             
     except KeyboardInterrupt:
