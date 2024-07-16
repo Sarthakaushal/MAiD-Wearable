@@ -5,6 +5,7 @@ import time
 from edge.conf import BT_Loc
 from queue import Queue
 from core import BleScanner
+from edge.collate import TemporalDataCollator
 
 async def scan_devices():
     scanner = BleakScanner()
@@ -38,6 +39,7 @@ def register_device(client):
         time.sleep(5)  # Wait for 5 seconds before retrying
 
 async def main():
+    
     # MQTT connection and setup
     topics_to_subs = [BT_Loc.RSSI_TOPIC, BT_Loc.ACK]
     client = mqtt.Client(userdata={'registered': False})
@@ -60,6 +62,7 @@ async def main():
     scanner = BleScanner(mem_buff)
     scanner.start()
     
+    ble_data = TemporalDataCollator()
     
     #Send data packets to hub
     try:
@@ -71,10 +74,14 @@ async def main():
                 # rssi_values = await scan_bluetooth_devices()
                 # if first:
                 print(device_address, rssi, name)
+                ble_data.insert(device_address, rssi)
+                payload_data = ble_data.get()
                 payload = f"DeviceID:{BT_Loc.DEVICE_ID}\n"
-                payload += f"{device_address}:{rssi}\n"
+                for uuid in payload_data.data.keys():
+                    payload += f"{uuid}:{payload_data.data[uuid]}\n"
                 client.publish(BT_Loc.RSSI_TOPIC, payload)
                 # await asyncio.sleep(.1)
+            
     except KeyboardInterrupt:
         print("Terminating...")
     finally:
