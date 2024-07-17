@@ -13,19 +13,16 @@ class TemporalDataCollator:
     
     def get(self)->SyncedData:
         rssi_data = {}
-        for key in self.data.uuids:
-            if len(self.data.uuids) <3:
+        if len(self.data.uuids) <3:
                 return SyncedData(valid=False, data={})
-            else:
-                rssi_data[key] = self.data.buffer[key].pop(-1)
-        
-        self.data.buffer = rssi_data
         for key in self.data.uuids:
-            self.data.buffer[key] = [rssi_data[key]]
-        self.data.uuids = list(rssi_data.keys())
+                rssi_data[key] = self.data.buffer[key].pop(-1)
+        payload = SyncedData(valid=True, data=rssi_data)
+        self.data.buffer = {}
+        self.data.uuids = []
         # self.data = BleBuffer(uuids=[], buffer={})
         print(f'RSSI Data: {rssi_data}')
-        payload = SyncedData(valid=True, data=rssi_data)
+        
         return payload
     
     

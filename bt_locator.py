@@ -80,7 +80,7 @@ async def main():
                 if payload_data.valid:
                     payload = f"DeviceID:{BT_Loc.DEVICE_ID}\n"
                     for uuid in payload_data.data.keys():
-                        payload += f"{uuid}:{payload_data.data[uuid][0]}\n"
+                        payload += f"{uuid}:{payload_data.data[uuid]}\n"
                     client.publish(BT_Loc.RSSI_TOPIC, payload)
                 else:
                     print('Not enough data to publish')

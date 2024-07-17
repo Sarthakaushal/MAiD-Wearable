@@ -13,7 +13,7 @@ if __name__ == '__main__':
     scanner.start()
     
     # time to run the scan for
-    TIME_LIMITs = [10,50, 100, 200, 300]
+    TIME_LIMITs = [10,50, 100]
     avg_time = {}
     for time_lim in TIME_LIMITs:
         start_time = time.time()
@@ -44,6 +44,6 @@ if __name__ == '__main__':
     df = pd.DataFrame(df_comapt_list)
     cols = list(df.columns)
     cols.remove('time_duration')
-    df.to_csv('output/avg_rssi_vals.csv', columns=['time_duration']+cols,
+    df.to_csv('output/avg_rssi_vals_07_17.csv', columns=['time_duration']+cols,
               index = False)
         
